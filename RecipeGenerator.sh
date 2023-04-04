@@ -7,11 +7,30 @@ What kind of recipe would you like? (beef, chicken, seafood, vegetarian)
 
 # it worked
 ================================================================
+#Chef Icon
+#chef.sh 
 
 #!/bin/bash
 
-# Greet the user with a chef icon
-echo "👨<200d>🍳 Welcome to the Recipe Generator! 👩<200d>🍳"
+function print_chef_hat() {
+  echo "_____________________"
+  echo "   /\       /\      "
+  echo "  /  \_____/  \     "
+  echo " /             \    "
+  echo "/_______________\   "
+  echo "|^^^^^^^^^^^^^^^|   "
+  echo "|               |   "
+  echo "|     AASSK     |   "
+  echo "|     US!       |   "
+  echo "|               |   "
+  echo "|_______________|   "
+}
+
+# Call the function to print the chef hat ASCII art
+print_chef_hat
+================================================================
+
+#!/bin/bash
 
 # Define the recipe files
 BEEF_FILE="beef_recipes.txt"
