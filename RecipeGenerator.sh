@@ -111,4 +111,120 @@ function generate_recipe() {
 - Serious Eats: https://www.seriouseats.com/
 - Simply Recipes: https://www.simplyrecipes.com/
 
+================================================================================
+
+ANOTHER ONE:
+THIS HAS MORE OPTIONS. 
+
+#!/bin/bash
+
+# Greet the user with a chef icon
+function print_chef_hat() {
+  echo "_____________________"
+  echo "   /\       /\      "
+  echo "  /  \_____/  \     "
+  echo " /             \    "
+  echo "/_______________\   "
+  echo "|^^^^^^^^^^^^^^^|   "
+  echo "|               |   "
+  echo "|     AASSK     |   "
+  echo "|     US!       |   "
+  echo "|               |   "
+  echo "|_______________|   "
+}
+
+# Call the function to print the chef hat ASCII art
+print_chef_hat
+echo "👨‍🍳 Welcome to the Recipe Generator! 👩‍🍳"
+
+# Define the recipe files
+BEEF_FILE="beef_recipes.txt"
+CHICKEN_FILE="chicken_recipes.txt"
+SEAFOOD_FILE="seafood_recipes.txt"
+VEGETARIAN_FILE="vegetarian_recipes.txt"
+
+# Define the functions
+function generate_recipe() {
+  case $1 in
+    beef)
+      recipe_file="$BEEF_FILE"
+      echo "Here is a $1 recipe."
+      cat $recipe_file
+      ;;
+    chicken)
+      recipe_file="$CHICKEN_FILE"
+      echo "Here is a $1 recipe."
+      cat $recipe_file
+      ;;
+    seafood)
+      recipe_file="$SEAFOOD_FILE"
+      echo "Here is a $1 recipe."
+      cat $recipe_file
+      ;;
+    vegetarian)
+      recipe_file="$VEGETARIAN_FILE"
+      echo "Here is a $1 recipe."
+      cat $recipe_file
+      ;;
+    *)
+      echo "Invalid category. Please choose from beef, chicken, seafood, or vegetarian."
+      return 1
+  esac
+
+  if [[ -f $recipe_file ]]; then
+    echo "For more $1 recipes, check out $1.com or $1recipes.com."
+  else
+    echo "Sorry, there are no $1 recipes available at this time."
+  fi
+}
+
+function generate_recipe_with_ingredients() {
+  echo "What ingredients do you have in your pantry?"
+  read ingredients
+  echo "Searching for recipes with ingredients: $ingredients"
+
+  # Search each recipe file for recipes that contain all the specified ingredients
+  local recipes=()
+  for recipe_file in $BEEF_FILE $CHICKEN_FILE $SEAFOOD_FILE; do
+    if [[ -f $recipe_file ]]; then
+      while read recipe; do
+        if echo "$recipe" | grep -qi "$ingredients"; then
+          recipes+=("$recipe_file:$recipe")
+        fi
+      done < "$recipe_file"
+    fi
+  done
+
+  if [[ ${#recipes[@]} -eq 0 ]]; then
+    echo "Sorry, no recipes were found with the specified ingredients."
+    return
+  fi
+
+  # Pick a random recipe from the list of matching recipes
+  random_index=$(( RANDOM % ${#recipes[@]} ))
+  random_recipe=${recipes[$random_index]}
+
+  # Print the selected recipe
+  echo "Here is a recipe that includes the ingredients you have:"
+  echo "------ ${random_recipe%%:*} ------"
+  echo "${random_recipe#*:}"
+  echo "--------------------------"
+}
+
+# Ask the user for their preferences
+# Ask the user for their preferences
+echo "Please choose a recipe category from beef, chicken, seafood, or none:"
+read category
+
+if [[ $category == "beef" || $category == "chicken" || $category == "seafood" ]]; then
+  generate_recipe "$category"
+elif [[ $category == "none" ]]; then
+  echo "What ingredients do you have in your pantry?"
+  read ingredients
+  generate_recipe_with_ingredients "$ingredients"
+else
+  echo "Invalid category. Please choose from beef, chicken, seafood, or none."
+fi
+
+
 
