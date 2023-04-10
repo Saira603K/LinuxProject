@@ -1,3 +1,97 @@
+==================================================================
+==================================================================
+#!/bin/bash
+
+# Greet the user with a chef icon
+function print_chef_hat() {
+  echo "_____________________"
+  echo "   /\       /\      "
+  echo "  /  \_____/  \     "
+  echo " /             \    "
+  echo "/_______________\   "
+  echo "|^^^^^^^^^^^^^^^|   "
+  echo "|               |   "
+  echo "|     AASSK     |   "
+  echo "|     US!       |   "
+  echo "|               |   "
+  echo "|_______________|   "
+}
+
+# Call the function to print the chef hat ASCII art
+print_chef_hat
+
+# Greet the user
+name=$(whoami)
+location=$(curl -s https://ipapi.co/city)
+time=$(date +"%r")
+echo "Hello $name! It's $time in $location."
+
+# Main loop
+while true; do
+    echo "Please choose a category:"
+    echo "1. Chicken"
+    echo "2. Beef"
+    echo "3. Vegetarian"
+    echo "4. Seafood"
+    read -p "Enter the number of your choice (or type 'q' to quit): " choice
+
+    if [[ $choice == "q" ]]; then
+        break
+    fi
+
+    display_recipe $choice
+
+    # Prompt the user for their allergies
+    read -p "Enter any ingredients you are allergic to (separated by commas): " allergies_input
+
+    # Process the user input to create a list of allergies
+    IFS=',' read -ra allergies <<< "$allergies_input"
+
+    # Filter out recipes containing allergic ingredients
+    filter_recipes() {
+        local recipe_file=$1
+        local temp_file=$(mktemp)
+
+        cp "$recipe_file" "$temp_file"
+
+        for allergy in "${allergies[@]}"; do
+            grep -i -v -E "Ingredients:.*\b$allergy\b" "$temp_file" > "${temp_file}_filtered"
+            mv "${temp_file}_filtered" "$temp_file"
+        done
+
+        cat "$temp_file"
+        rm "$temp_file"
+    }
+
+    echo "Displaying recipes without your allergens:"
+    filter_recipes "$(echo "${choice}_recipes.txt" | sed 's/1/chicken/; s/2/beef/; s/3/vegetarian/; s/4/seafood/')"
+
+    read -p "Are you satisfied or do you want something sweet to try? (yes/no) " sweet_choice
+
+    if [[ $sweet_choice == "yes" ]]; then
+        echo "Glad you found what you're looking for! Goodbye!"
+        break
+    elif [[ $sweet_choice == "no" ]]; then
+        echo "Let's find something sweet for you!"
+        find_chocolate_chip_recipes() {
+            local recipe_file=$1
+            grep -i -E -B1 "chocolate chips" "$recipe_file" | grep -i -E "(chocolate chips.*){2,}"
+        }
+
+        echo "Displaying sweet tooth recipes..."
+        cat sweet_tooth.txt
+        echo "Displaying sweet tooth recipes with lots of chocolate chips..."
+        find_chocolate_chip_recipes sweet_tooth.txt
+    else
+        echo "Invalid input. Please try again."
+    fi
+done
+
+
+
+==================================================================
+==================================================================
+
 #creating a custom command.
 
 172-26-2-101:~/project$ alias recipes='./recipe_generator.sh'
