@@ -1,0 +1,247 @@
+#!/bin/bash
+
+recipes_dir="/Users/aaliyahsalia/CS230project"
+
+time=$(date +"%I:%M")
+echo "The current time is $time"
+
+#Greeting!
+
+#We will greet the user with the chef icon
+function print_chef_hat() {
+ echo "_____________________"
+  echo "   /\       /\      "
+  echo "  /  \_____/  \     "
+  echo " /             \    "
+  echo "/_______________\   "
+  echo "|^^^^^^^^^^^^^^^|   "
+  echo "|               |   "
+  echo "|     AASSK     |   "
+  echo "|     US!       |   "
+  echo "|               |   "
+  echo "|_______________|   "
+  echo "--------------------"
+}
+
+
+#AASSK stands for the initials of our member names Aaliyah, Antonio, Saira, Sanjida and Karina.
+#We will call the function to print the chef hat.
+print_chef_hat
+
+
+#Greet the user
+
+echo "Gooday! Welcome to AASSK US! Your friendly Recipe Generator where we make your life easy!"
+
+echo "What's your name?"
+read name
+echo "Hello, $name!"
+
+
+
+echo "Here are your options for today, $name :)"
+
+###################################################################################
+
+search_restaurant() {
+  option=""
+  
+  #loop until the user chooses to exit
+  while [ "$option" != no ]
+  do
+    echo "Here are your restaurant options for today $name :"
+    echo " "
+    echo "[1] Mexican restaurants"
+    echo "[2] Indian restaurants"
+    echo "[3] Pakistani restaurants"
+    echo "[4] Exit Program"
+    echo " "
+    echo "Please select the type of restaurant that you are looking for: "
+    read typeres 
+    
+    #display the restaurants based on the user's choice
+    case $typeres in
+      1)
+        echo "Here are the Mexican restaurants in Fremont! :"
+        echo "Taqueria Las Vegan. -
+          Location: 45401 Fremont Blvd, Fremont, CA, 94538"
+        echo "El gordo y el Flaco. -
+          Location: 43100 Sumter Ave, Fremont, CA 94538"
+        ;;
+      2)
+        echo "Here are the Indian restaurants in Fremont! :"
+        echo "Chaat House Fremont. -
+          Location: 46465 Mission Blvd, Fremont, CA, 94539"
+        echo "Hyderabad Dum Biryani. -
+          Location: 42318 Fremont Blvd, Fremont, CA 94538"
+        ;;
+      3)
+        echo "Here are the Pakistani restaurants in Fremont! :"
+        echo "Pakwan Restaurant - Fremont. -
+          Location: 41068 Fremont Blvd, Fremont, CA 94538"
+        echo "Shalimar Restaurant. -
+          Location: 3325 Walnut Ave, Fremont, CA, 94538"
+        ;;
+      4)
+        exit 0 #we will exit the script
+        ;;
+      *)
+        echo "Invalid option"
+        ;;
+    esac
+    
+    #if the user does not find a suitable restaurant, we will redirect them to the recipe generator
+    echo "Do you want to continue finding restaurants? (yes/no):"
+    read option
+
+  done
+
+  echo "We're sorry you couldn't find anything in our restaurant finder. You will be redirected to our recipe generator! Thank you!"
+  echo " "
+}
+
+################################################################################################
+
+display_recipe() {
+    
+    #Set the path to the recipe file based on the cuisine
+
+    cuisine_file="$recipes_dir/$1.txt"
+   
+    #Prompt the user for a recipe name or keyword
+    echo "Please enter recipe name or keyword(s):"
+    read keyword
+    
+    #Search for recipes in the cuisine file that match the keyword
+    echo "Searching for recipes containing $keyword"
+    recipe=$(awk -v RS= -v IGNORECASE=1 -v keyword="$keyword" 'match($0, keyword) {print}' "$cuisine_file")
+    
+    #If there is at least one recipe that matches the keyword, we will display them
+    if [ -n "$recipe" ]; then
+        echo "Here is your recipe!"
+        echo ""
+ 
+        #We will count the number of recipes in the cuisine file and store each recipe in a seperate file
+        recipe_count=$(awk '/^ *[0-9]+ *\)/{n++;next}{print > ("recipe"n".txt"); printf "\n"}' "$cuisine_file" < /dev/null)
+
+        #We will loop through each recipe and display its ingredients and instructions
+        for ((i=1;i<=recipe_count;i++)); do
+            echo "Recipe $i:"
+            echo ""
+
+            #Display the ingredients for the current recipe
+            awk '/^ *[0-9]+ *\)/{print "";print "Ingredients:";print "";next}{print}' "recipe$i.txt" | sed 's/\$//g' | awk 'NR>1{print}' | sed 's/^/ - /'
+            echo ""
+
+            #Display the instructions for the current recipe
+            awk '/^ *[0-9]+ *\)/{next}/^Instructions:/{print "";print "";print "Instructions:";print "";next}{print}' "recipe$i.txt" | sed 's/\$//g' | awk 'NR>1{print}' | sed 's/^/   /'
+            echo ""
+            echo "#################################################################"
+            echo ""
+        done
+        
+        #Display the recipe that matches the keyword
+	echo "$recipe" | sed 's/\$//g'
+        echo "#################################################################"
+        echo ""
+        echo ""
+
+        #Display the menu options for the user
+        echo "1) Chicken"
+        echo "2) Beef"
+        echo "3) Vegeterian"
+        echo "4) Seafood"
+        echo "5) Find a restaurant"
+	echo "6) Quit"
+        echo ""
+        echo " " 
+    
+
+	#Start an infinite loop
+        while true; do
+           
+            read -p "Please select a cuisine: " choice
+            case $choice in
+                [1])           
+                    display_recipe Chicken            
+                    ;;
+                [2])
+                    display_recipe Beef
+                    ;;
+                [3])
+                    display_recipe Vegeterian
+                    ;;
+                [4])
+                    display_recipe Seafood
+                    ;;
+		[5])
+		   search_restaurant
+		   ;;
+                [6])
+                   echo "Goodbye! Opening page in browser..."
+		   sleep 1
+		   open thankyou.html
+		   exit 0              
+                    ;;
+                *)
+                    echo "Invalid choice, please try again."
+                    ;;
+            esac
+        done
+    else
+        echo "No recipes found for the entered name or keyword(s)."
+        echo "You can choose another cuisine, type in another name or keyword(s), or quit."
+    fi
+}
+
+
+
+PS3="Please select a cuisine: "
+options=("Chicken" "Beef" "Vegeterian" "Seafood" "Search for a restaurant"  "Quit")
+
+Chicken_file="./Chicken.txt"
+Beef_file="./Beef.txt"
+Vegeterian_file="./Vegeterian.txt"
+Seafood_file="./Seafood.txt"
+
+
+while true; do
+	select opt in "${options[@]}"
+	do
+    		case $opt in
+        		"Chicken")
+            			echo "You chose Chicken"
+            			display_recipe "Chicken"
+				break
+            			;;
+
+        		"Beef")
+            			echo "You chose Beef"
+            			display_recipe "Beef"
+				break
+            			;;
+        		"Vegeterian")
+            			echo "You chose Vegeterian"
+            			display_recipe "Vegeterian"
+				break
+            			;;
+			"Seafood")
+				echo "You chose Seafood"
+				display_recipe "Seafood"
+				break
+				;;
+			"Search for a restaurant")
+				search_restaurant
+				break
+				;;
+        		"Quit")
+				
+                   		echo "Goodbye! Opening page in browser..."
+				sleep 1
+		   		open thankyou.html
+		                exit 0
+            			;;
+        		*) echo "Invalid option $REPLY";;
+    		esac
+	done
+done
