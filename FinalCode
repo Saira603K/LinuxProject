@@ -1,13 +1,8 @@
 #!/bin/bash
 
-
 recipes_dir="/Users/aaliyahsalia/CS230project"
 
-cat welcome.txt
-
-
 time=$(date +"%I:%M")
-echo " "
 echo "The current time is $time"
 
 #Greeting!
@@ -45,6 +40,7 @@ echo "Hello, $name!"
 
 
 echo "Here are your options for today, $name :)"
+
 
 
 search_restaurant() {
@@ -104,33 +100,6 @@ search_restaurant() {
   echo " "
 }
 
-
-################################################################################################
-
-allergy_options=("salsa" "garlic" "cumin" "paprika" "flour" "eggs" "corn")
-
-# Ask user for allergies
-read -p "Do you have any allergies? (y/n) " allergies
-
-# If user has allergies, ask for allergy options
-if [ "$allergies" == "y" ]; then
-  echo "Please select your allergies from the following options:"
-  for i in "${!allergy_options[@]}"; do
-    echo "$i) ${allergy_options[$i]}"
-  done
-
-  read -p "Enter the numbers of your allergies (comma-separated list): " allergy_numbers
-
-  # Create an array of selected allergies
-  IFS=',' read -ra allergy_list <<< "$allergy_numbers"
-  selected_allergies=()
-  for i in "${allergy_list[@]}"; do
-    selected_allergies+=("${allergy_options[$i]}")
-  done
-
-  echo "Your selected allergies: ${selected_allergies[@]}"
-fi
-
 ################################################################################################
 
 display_recipe() {
@@ -138,18 +107,7 @@ display_recipe() {
     #Set the path to the recipe file based on the cuisine
 
     cuisine_file="$recipes_dir/$1.txt"
-
-
-    # Read recipes from file
-    recipes=$(<$cuisine_file)
-
-    # Remove recipes containing selected allergies
-    if [ ! -z "$selected_allergies" ]; then
-      for allergy in "${selected_allergies[@]}"; do
-        recipes=$(echo "$recipes" | sed "/$allergy/d")
-      done
-    fi
-
+   
     #Prompt the user for a recipe name or keyword
     echo "Please enter recipe name or keyword(s):"
     read keyword
@@ -234,10 +192,7 @@ display_recipe() {
         echo "No recipes found for the entered name or keyword(s)."
         echo "You can choose another cuisine, type in another name or keyword(s), or quit."
     fi
-
-
 }
-
 
 
 
